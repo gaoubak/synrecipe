@@ -7,7 +7,12 @@
     <div class="collapse navbar-collapse" id="navbarColor01">
       <ul class="navbar-nav me-auto">
         <li class="nav-item">
-          <a class="nav-link active" href="#">Home
+          <a class="nav-link active" href="{{ path('home.index') }}">Accueil 
+            <span class="visually-hidden">(current)</span>
+          </a>
+        </li>  
+        <li class="nav-item">
+          <a class="nav-link active" href="{{ path('ingredient_index') }}">Ingredient
             <span class="visually-hidden">(current)</span>
           </a>
         </li>  
