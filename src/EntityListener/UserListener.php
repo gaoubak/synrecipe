@@ -12,7 +12,7 @@ class UserListener
     {
         $this->passwordHasher = $passwordHasher;
     }
-    public function PreUpdate (UserPasswordHasherInterface $passwordHasher)
+    public function preUpdate (UserPasswordHasherInterface $passwordHasher)
     {
         $this->passwordHasher = $passwordHasher;
     }
