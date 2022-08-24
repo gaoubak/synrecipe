@@ -16,7 +16,7 @@ class Ingredient
     #[ORM\Column(type:"integer")]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'string', length: 50)]
+    #[ORM\Column(type: 'string', length: 50)] 
     #[Assert\NotBlank()]
     #[Assert\Length(min: 2, max: 50, minMessage:"minErrorMessage",maxMessage:"MaxErrorMessage")]
     private ?string $name = null;
@@ -77,5 +77,10 @@ class Ingredient
         $this->createdAt = $createdAt;
 
         return $this;
+    }
+
+    public function __toString()
+    {
+        return $this->getName();
     }
 }

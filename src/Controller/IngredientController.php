@@ -17,6 +17,12 @@ class IngredientController extends AbstractController
     #[Route('/ingredient', name: 'ingredient_index')]
     public function index(IngredientRepository $ingredientRepository, PaginatorInterface $paginator, Request $request): Response
     {
+        /* 
+        * @param PaginatorInterface $paginator
+        * @param Request $request
+        * @param IngredientRepository $ingredientRepository
+        * @return Response
+        */
         $ingredients = $paginator->paginate(
             $ingredientRepository->findAll(),
             $request->query->getInt('page', 1), /*page number*/
