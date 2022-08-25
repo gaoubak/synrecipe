@@ -38,14 +38,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\NotNull()]
     private array $roles = [];
 
-    private ?string $planepassword  = null ;
+    private ?string $plainPassword  = null ;
+
+    private ?string $newPassword = null;
 
     /**
      * @var string The hashed password
      */
     #[ORM\Column]
-    #[Assert\NotBlank()]
-    private ?string $password = null;
+    #[Assert\NotNull()]
+    private ?string $password = 'password';
 
     #[ORM\Column]
     #[Assert\NotNull()]
@@ -114,6 +116,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPlainPassword($plainPassword)
     {
         $this->plainPassword = $plainPassword;
+
+        return $this;
+    }
+    public function getnewPassword()
+    {
+        return $this->newPassword;
+    }
+
+    /**
+     * Set the value of newPassword
+     *
+     * @return  self
+     */
+    public function setnewPassword($newPassword)
+    {
+        $this->newPassword = $newPassword;
 
         return $this;
     }
