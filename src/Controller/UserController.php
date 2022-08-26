@@ -11,26 +11,21 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
 class UserController extends AbstractController
 {
+    #[Security("is_granted('ROLE_USER') and user === chosenUser")]
     #[Route('/utilisateur/edition/{id}', name: 'user.edit',  methods: ['GET', 'POST'] )]
-    public function edit(User $user, Request $request, EntityManagerInterface $manager, UserPasswordHasherInterface $hasher): Response
+    public function edit(User $chosenUser, Request $request, EntityManagerInterface $manager, UserPasswordHasherInterface $hasher): Response
     {
-        if(!$this->getUser()){
-            return $this->redirectToRoute('security.login');
-        };
-        if($this->getUser() !== $user){
-            return $this->redirectToRoute('security.login');
-        };
-        
-        $form = $this->createForm(UserType::class, $user);
+        $form = $this->createForm(UserType::class, $chosenUser);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            if ($hasher->isPasswordValid($user, $form->getData()->getPlainPassword())) {
-                $user = $form->getData();
-                $manager->persist($user);
+            if ($hasher->isPasswordValid($chosenUser, $form->getData()->getPlainPassword())) {
+                $chosenUser = $form->getData();
+                $manager->persist($chosenUser);
                 $manager->flush();
 
                 $this->addFlash(
@@ -51,19 +46,20 @@ class UserController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+    #[Security("is_granted('ROLE_USER') and user === chosenUser")]
     #[Route('/utilisateur/edition-mot-de-passe/{id}', name:'user.edit.password', methods: ['GET', 'POST'])]
-    public function editpassword(User $user,Request $request, EntityManagerInterface $manager,UserPasswordHasherInterface $hasher): Response{
-        $form = $this->createForm(UserPasswordType::class, $user);
+    public function editpassword(User $chosenUser,Request $request, EntityManagerInterface $manager,UserPasswordHasherInterface $hasher): Response{
+        $form = $this->createForm(UserPasswordType::class, $chosenUser);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            if ($hasher->isPasswordValid($user, $form->getData()->getPlainPassword())) {
-                $user->setPlainPassword(
+            if ($hasher->isPasswordValid($chosenUser, $form->getData()->getPlainPassword())) {
+                $chosenUser->setPlainPassword(
                      $form->getData()->getnewPassword()
                 );
-                $user->setPassword(
+                $chosenUser->setPassword(
                     $form->getData()->getPlainPassword()
                );
-                $manager->persist($user);
+                $manager->persist($chosenUser);
                 $manager->flush();
 
                 $this->addFlash(
@@ -83,12 +79,12 @@ class UserController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
-
+    #[Security("is_granted('ROLE_USER') and user === chosenUser")]
     #[Route('/utilisateur/delete/{id}', name:'recipe.delete', methods: ['GET'])]
-    public function delete(User $user, Request $request, EntityManagerInterface $manager) : Response
+    public function delete(User $chosenUser, Request $request, EntityManagerInterface $manager) : Response
     {
         
-        if (!$user){
+        if (!$chosenUser){
             return $this->redirectToRoute('recipe_index');
             $this->addFlash(
                 'warning',
@@ -96,7 +92,7 @@ class UserController extends AbstractController
             );
 
         }
-        $manager->remove($user);
+        $manager->remove($chosenUser);
         $manager->flush();
         $this->addFlash(
             'success',

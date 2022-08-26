@@ -11,12 +11,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Knp\Component\Pager\PaginatorInterface;
 use App\Repository\RecipeRepository;
 use Doctrine\ORM\EntityManagerInterface;
-
-
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
 class RecipeController extends AbstractController
 {
     #[Route('/recipe', name: 'recipe_index', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function index(RecipeRepository $recipeRepository, PaginatorInterface $paginator, Request $request): Response
     {
         /* 
@@ -28,7 +29,7 @@ class RecipeController extends AbstractController
         * @return Response
         */
         $recipes = $paginator->paginate(
-            $recipeRepository->findAll(),
+            $recipeRepository->findBy(['user' => $this->getUser()]),
             $request->query->getInt('page', 1), /*page number*/
             10 /*limit per page*/
         );
@@ -38,10 +39,12 @@ class RecipeController extends AbstractController
         
     }
     #[Route('/recipe/nouveau', name: 'recipe.new' , methods: ['POST','GET'])]
+    #[IsGranted('ROLE_USER')]
     public function new(Request $request,EntityManagerInterface $manager) : Response
     {
         $recipes = new Recipe();
         $form = $this->createForm(RecipeType::class, $recipes);
+        $recipes->setUser($this->getUser());
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -60,6 +63,7 @@ class RecipeController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+    #[Security("is_granted('ROLE_USER') and  user === recipe.getUser()")]
     #[Route('/recipe/edit/{id}', name:'recipe.edit', methods: ['POST','GET'])]
     public function edit(Recipe $recipe, Request $request, EntityManagerInterface $manager) : Response
     {
@@ -82,6 +86,7 @@ class RecipeController extends AbstractController
         ]);
         
     }
+    #[Security("is_granted('ROLE_USER') and  user === recipe.getUser()")]
     #[Route('/recipe/delete/{id}', name:'recipe.delete', methods: ['GET'])]
     public function delete(Recipe $recipe, Request $request, EntityManagerInterface $manager) : Response
     {
